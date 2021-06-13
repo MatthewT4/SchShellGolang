@@ -1,17 +1,14 @@
 package main
 
 import (
-	"fmt"
-	"github.com/Mat/SchShell/internal"
-	data "github.com/Mat/SchShell/internal/db"
-	"github.com/Mat/SchShell/internal/server"
-	"github.com/Mat/SchShell/internal/ttt"
+	"github.com/MatthewT4/SchShellGolang/internal"
 )
 
 func main() {
-	server.Test("ss")
+	internal.Start()
+	/*server.Test("ss")
 	var db data.DataBase = data.NewData()
-	db.Add("ddd")
+	db.Add("ddd")e
 	db.Print()
 	err := ttt.Prt("aaa")
 	if err == nil {
@@ -31,8 +28,8 @@ func main() {
 		id := res.InsertedID
 		fmt.Println(i, id)
 
-	}*/
+	}
 	internal.Start()
 	conf := server.Config{Addr: ":8080"}
-	server.Start(conf)
+	server.Start(conf)*/
 }

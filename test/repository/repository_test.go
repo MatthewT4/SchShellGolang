@@ -2,9 +2,10 @@ package repository
 
 import (
 	"context"
-	"github.com/Mat/SchShell/internal"
-	"github.com/Mat/SchShell/internal/db/repository"
-	mongodb "github.com/Mat/SchShell/pkg/mongoDB"
+	"github.com/MatthewT4/SchShellGolang/internal"
+	"github.com/MatthewT4/SchShellGolang/internal/db/repository"
+	"github.com/MatthewT4/SchShellGolang/internal/service"
+	mongodb "github.com/MatthewT4/SchShellGolang/pkg/mongoDB"
 	"testing"
 )
 
@@ -18,7 +19,7 @@ func TestAddAndFindCatalogues(t *testing.T) {
 	colCat := repository.NewCataloguesRepo(db)
 	us := repository.User{Login: "Mathew", Password: "12345", Role: internal.Administrator}
 	data := []string{"logo.jpg", "OK.jpg"}
-	cat := repository.Catalog{Name: "Default", Holder: us.Login, Data: data, Type: repository.Image}
+	cat := service.Catalog{Name: "Default", Holder: us.Login, Data: data, Type: service.Image}
 	{
 		result, err := colCat.AddCatalog(context.TODO(), cat)
 		if err != nil {
@@ -57,6 +58,7 @@ func TestAddAndFindCatalogues(t *testing.T) {
 	client.Disconnect(context.TODO())
 }
 
+/*
 func TestAddAndDelData(t *testing.T) {
 	client, err := mongodb.NewClient("mongodb+srv://cluster0.lbets.mongodb.net", "Mathew", "8220")
 	if err != nil {
@@ -68,5 +70,4 @@ func TestAddAndDelData(t *testing.T) {
 	us := repository.User{Login: "Mathew", Password: "12345", Role: internal.Administrator}
 	data := []string{"logo.jpg", "OK.jpg"}
 
-}
-
+}*/
