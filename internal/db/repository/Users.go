@@ -7,36 +7,39 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )
-type UserCollection interface {
-	AddUser(ctx context.Context, user User) error
-	CheckUser(ctx context.Context, user User) error
-	ReplayUserPassword(ctx context.Context, user User, newPassword string) error
+
+type Users interface {
+	AddUser(ctx context.Context, user *DbUser) error
+	CheckUser(ctx context.Context, login *string, password *string) error
+	ReplayUserPassword(ctx context.Context, login *string, password *string, newPassword *string) error
 }
 
-
-type User struct {
-	Login string 		`bson:"login,omitempty"`
-	Password string		`bson:"password,omitempty"`
-	Role int			`bson:"group,omitempty"`
-	Email string		`bson:"email,omitempty"`
-	Catalogues []string 	`bson:"catalogues,omitempty"`
+type DbUser struct {
+	Login      *string   `bson:"login,omitempty"`
+	Password   *string   `bson:"password,omitempty"`
+	Role       *int      `bson:"group,omitempty"`
+	Email      *string   `bson:"email,omitempty"`
+	Catalogues *[]string `bson:"catalogues,omitempty"`
 }
 
 type UserRepo struct {
 	collection *mongo.Collection
 }
-/*
-func NewUser(login, password string, role int, email string) User {
-	return User{login, password, role, email}
-}*/
-func GetNullUser() User {
-	return User{}
+
+func NewDbUser(login *string, password *string, role *int, email *string, catalogues *[]string) *DbUser {
+	return &DbUser{
+		Login:      login,
+		Password:   password,
+		Role:       role,
+		Email:      email,
+		Catalogues: catalogues,
+	}
 }
 func NewUserRepo(db *mongo.Database) *UserRepo {
 	return &UserRepo{collection: db.Collection(NameUserCollection)}
 }
 
-func (u *UserRepo) AddUser(ctx context.Context, user User) error {
+func (u *UserRepo) AddUser(ctx context.Context, user *DbUser) error {
 	//_, err := u.collection.InsertOne(ctx, bson.M{"_id": user.Login, "password": user.password, "group": user.role})
 	bs, er := bson.Marshal(user)
 	if er != nil {
@@ -52,15 +55,14 @@ func (u *UserRepo) AddUser(ctx context.Context, user User) error {
 	return nil
 }
 
-func (u *UserRepo) CheckUser(ctx context.Context, user User) error {
-	err := u.collection.FindOne(ctx, bson.M{"login": user.Login, "password": user.Password}).Err()
-
+func (u *UserRepo) CheckUser(ctx context.Context, login *string, password *string) error {
+	err := u.collection.FindOne(ctx, bson.M{"login": login, "password": password}).Err()
 	return err
 }
 
-func (u *UserRepo) ReplayUserPassword(ctx context.Context, user User, newPassword string) error {
+func (u *UserRepo) ReplayUserPassword(ctx context.Context, login *string, password *string, newPassword *string) error {
 	//filter := bson.D{{"name", user.Login}, {"password", user.Password}}
-	filter := bson.M{"login": user.Login, "password": user.Password}
+	filter := bson.M{"login": login, "password": password}
 	update := bson.D{
 		{"$set", bson.D{
 			{"password", newPassword},
@@ -72,14 +74,14 @@ func (u *UserRepo) ReplayUserPassword(ctx context.Context, user User, newPasswor
 }
 
 //RemoveUser Delete user by login
-func (u *UserRepo) RemoveUser(ctx context.Context, user User) error {
-	deleteResult, err := u.collection.DeleteOne(ctx, bson.M{"login": user.Login})
+func (u *UserRepo) RemoveUser(ctx context.Context, login *string) error {
+	deleteResult, err := u.collection.DeleteOne(ctx, bson.M{"login": login})
 	fmt.Println(deleteResult)
 	return err
 }
 
-func (u *UserRepo) SetRole(ctx context.Context, user User, newRole int) error {
-	filter := bson.M{"login": user.Login, "password": user.Password}
+func (u *UserRepo) SetRole(ctx context.Context, login *string, password *string, newRole int) error {
+	filter := bson.M{"login": login, "password": password}
 	update := bson.D{
 		{"$set", bson.D{
 			{"group", newRole},
@@ -88,8 +90,8 @@ func (u *UserRepo) SetRole(ctx context.Context, user User, newRole int) error {
 	updResult, err := u.collection.UpdateOne(ctx, filter, update)
 	fmt.Println(updResult)
 	return err
-	return nil
 }
+
 /*
 func (m *Mongo) OneInsert(Data interface{}, settings Settings) (string, error) {
 	collection := m.client.Database(settings.DataBaseName).Collection(settings.CollectionName)

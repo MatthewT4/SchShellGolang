@@ -3,9 +3,13 @@ package service
 import "go.mongodb.org/mongo-driver/mongo"
 
 type Service struct {
-	CatalogSer Catalogues
+	CatalogSer SCatalogues
+	ScreenSer  SScreens
 }
 
 func NewService(db *mongo.Database) *Service {
-	return &Service{NewCataloguesService(db)}
+	return &Service{
+		CatalogSer: NewSCataloguesService(db),
+		ScreenSer:  NewScreenService(db),
+	}
 }
