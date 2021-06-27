@@ -9,15 +9,16 @@ import (
 )
 
 type Users interface {
-	AddUser(ctx context.Context, user *DbUser) error
-	CheckUser(ctx context.Context, login *string, password *string) error
-	ReplayUserPassword(ctx context.Context, login *string, password *string, newPassword *string) error
+	AddUser(ctx context.Context, user *DbUser) (interface{}, error)
+	CheckUser(ctx context.Context, login string, password string) (int, error)
+	ReplayUserPassword(ctx context.Context, login string, password string, newPassword string) error
+	SetRole(ctx context.Context, login string, password string, newRole int) error
 }
 
 type DbUser struct {
 	Login      *string   `bson:"login,omitempty"`
 	Password   *string   `bson:"password,omitempty"`
-	Role       *int      `bson:"group,omitempty"`
+	Role       int       `bson:"group,omitempty"`
 	Email      *string   `bson:"email,omitempty"`
 	Catalogues *[]string `bson:"catalogues,omitempty"`
 }
@@ -26,7 +27,7 @@ type UserRepo struct {
 	collection *mongo.Collection
 }
 
-func NewDbUser(login *string, password *string, role *int, email *string, catalogues *[]string) *DbUser {
+func NewDbUser(login *string, password *string, role int, email *string, catalogues *[]string) *DbUser {
 	return &DbUser{
 		Login:      login,
 		Password:   password,
@@ -39,28 +40,31 @@ func NewUserRepo(db *mongo.Database) *UserRepo {
 	return &UserRepo{collection: db.Collection(NameUserCollection)}
 }
 
-func (u *UserRepo) AddUser(ctx context.Context, user *DbUser) error {
+func (u *UserRepo) AddUser(ctx context.Context, user *DbUser) (interface{}, error) {
 	//_, err := u.collection.InsertOne(ctx, bson.M{"_id": user.Login, "password": user.password, "group": user.role})
 	bs, er := bson.Marshal(user)
 	if er != nil {
 		logrus.Debug(er)
-		return er
+		return 0, er
 	}
 	//bs := bson.M{"login": login, "password"}
-	_, err := u.collection.InsertOne(ctx, bs)
+	res, err := u.collection.InsertOne(ctx, bs)
 	if err != nil {
 		logrus.Debug(err)
-		return err
+		return 0, err
 	}
-	return nil
+	return res.InsertedID, nil
 }
 
-func (u *UserRepo) CheckUser(ctx context.Context, login *string, password *string) error {
-	err := u.collection.FindOne(ctx, bson.M{"login": login, "password": password}).Err()
-	return err
+func (u *UserRepo) CheckUser(ctx context.Context, login string, password string) (int, error) {
+	var OnlyLoginStruct struct {
+		Group int `bson:"group"`
+	}
+	err := u.collection.FindOne(ctx, bson.M{"login": login, "password": password}).Decode(&OnlyLoginStruct)
+	return OnlyLoginStruct.Group, err
 }
 
-func (u *UserRepo) ReplayUserPassword(ctx context.Context, login *string, password *string, newPassword *string) error {
+func (u *UserRepo) ReplayUserPassword(ctx context.Context, login string, password string, newPassword string) error {
 	//filter := bson.D{{"name", user.Login}, {"password", user.Password}}
 	filter := bson.M{"login": login, "password": password}
 	update := bson.D{
@@ -80,7 +84,7 @@ func (u *UserRepo) RemoveUser(ctx context.Context, login *string) error {
 	return err
 }
 
-func (u *UserRepo) SetRole(ctx context.Context, login *string, password *string, newRole int) error {
+func (u *UserRepo) SetRole(ctx context.Context, login string, password string, newRole int) error {
 	filter := bson.M{"login": login, "password": password}
 	update := bson.D{
 		{"$set", bson.D{

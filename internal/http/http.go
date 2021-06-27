@@ -18,17 +18,24 @@ func NewRouter(db *mongo.Database) *Router {
 }
 
 func (rout *Router) Start() {
-	r := mux.NewRouter()
+	rou := mux.NewRouter()
+	r := rou.PathPrefix("/api/").Subrouter()
+	r.HandleFunc("/getdata", rout.GetData)
+	r.HandleFunc("/login", rout.Authorization)
+	rou.Handle("/", r)
+
+	rAdm := rou.PathPrefix("/api/admin").Subrouter()
 	//r.HandleFunc("/", HomeHandler)
 	//r.HandleFunc("/login", LoginUser)
-	r.HandleFunc("/addcatalog", rout.AddCatalog).Methods("POST") //POST
+	rAdm.HandleFunc("/addcatalog", rout.AddCatalog).Methods("POST")
+	rAdm.HandleFunc("/insertdata", rout.InsertDataInCatalog).Methods("POST")
+	rAdm.HandleFunc("/getcatalogs", rout.GetCatalogs).Methods("GET")
+	rAdm.HandleFunc("/getdata", rout.GetDataInCatalog).Methods("GET")
 	//r.HandleFunc("/articles", ArticlesHandler)
-	http.Handle("/admin", r)
+	rAdm.Use(rout.Authentication)
 
-	rou := mux.NewRouter()
-	rou.HandleFunc("/getdata", rout.GetData)
 	srv := &http.Server{
-		Handler: r,
+		Handler: rou,
 		Addr:    "127.0.0.1:8000",
 		// Good practice: enforce timeouts for servers you create!
 		WriteTimeout: 15 * time.Second,

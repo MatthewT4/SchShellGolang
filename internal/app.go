@@ -3,6 +3,7 @@ package internal
 import (
 	"github.com/MatthewT4/SchShellGolang/internal/http"
 	mongodb "github.com/MatthewT4/SchShellGolang/pkg/mongoDB"
+	"log"
 )
 
 /*
@@ -21,9 +22,16 @@ const (
 )
 
 func Start() {
+	/*//var tkm auth.TokenManager
+	var err error
+	//tkm, err = auth.NewManager("fglfgflgflg")
+	//tok, er := tkm.NewJWT("Mathew",  6*time.Minute)
+	fmt.Println(tok, er)
+	//str,  e := tkm.Parse(tok)
+	fmt.Println(str, e)*/
 	client, err := mongodb.NewClient("mongodb+srv://cluster0.lbets.mongodb.net", "Mathew", "8220")
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 	name := "test"
 	db := client.Database(name)

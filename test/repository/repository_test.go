@@ -17,9 +17,12 @@ func TestAddAndFindCatalogues(t *testing.T) {
 	name := "test"
 	db := client.Database(name)
 	colCat := repository.NewCataloguesRepo(db)
-	us := repository.User{Login: "Mathew", Password: "12345", Role: internal.Administrator}
+	login := "Mathew"
+	password := "12345"
+	role := internal.Administrator
+	us := repository.DbUser{Login: &login, Password: &password, Role: &role}
 	data := []string{"logo.jpg", "OK.jpg"}
-	cat := service.Catalog{Name: "Default", Holder: us.Login, Data: data, Type: service.Image}
+	cat := service.Catalog{Name: "Default", Holder: *us.Login, Data: data, Type: service.Image}
 	{
 		result, err := colCat.AddCatalog(context.TODO(), cat)
 		if err != nil {
