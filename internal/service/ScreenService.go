@@ -6,13 +6,6 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-type Screen struct {
-	Id       string `bson:"id"`
-	Name     string `bson:"name"`
-	Image    string `bson:"image"`
-	Position string `bson:"position"`
-}
-
 type SScreens interface {
 	SGetImage(id string) (int, string)
 }

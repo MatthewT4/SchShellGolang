@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"github.com/MatthewT4/SchShellGolang/internal/structions"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )
@@ -17,15 +18,6 @@ type DbScreen struct {
 	Position *string `bson:"position"`
 }
 
-func NewDbScreen(screenId *string, name *string, image *string, position *string) *DbScreen {
-	return &DbScreen{
-		ScreenId: screenId,
-		Name:     name,
-		Image:    image,
-		Position: position,
-	}
-}
-
 type ScreenRepo struct {
 	collection *mongo.Collection
 }
@@ -34,7 +26,7 @@ func NewScreenRepo(db *mongo.Database) *ScreenRepo {
 	return &ScreenRepo{collection: db.Collection(NameScreen)}
 }
 
-func (s *ScreenRepo) AddScreen(ctx context.Context, scr *DbScreen) (interface{}, error) {
+func (s *ScreenRepo) AddScreen(ctx context.Context, scr structions.Screen) (interface{}, error) {
 	data, er := bson.Marshal(scr)
 	if er != nil {
 		return 0, er

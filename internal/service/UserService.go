@@ -5,6 +5,7 @@ import (
 	"errors"
 	"github.com/MatthewT4/SchShellGolang/internal/auth"
 	"github.com/MatthewT4/SchShellGolang/internal/db/repository"
+	"github.com/MatthewT4/SchShellGolang/internal/structions"
 	"go.mongodb.org/mongo-driver/mongo"
 	"log"
 	"time"
@@ -12,35 +13,10 @@ import (
 
 const SignKey = "djskffdlsvshjsjdcfnv"
 
-type RoleType int
-
-const (
-	UserRole = iota
-	Moderation
-	Administration
-)
 const timerJWT = 15 * time.Minute
 
-type User struct {
-	Login      string   `bson:"login,omitempty"`
-	Password   string   `bson:"password,omitempty"`
-	Role       RoleType `bson:"group,omitempty"`
-	Email      string   `bson:"email,omitempty"`
-	Catalogues []string `bson:"catalogues,omitempty"`
-}
-
-func NewUser(login string, password string, role RoleType, email string, catalogues []string) *User {
-	return &User{
-		Login:      login,
-		Password:   password,
-		Role:       role,
-		Email:      email,
-		Catalogues: catalogues,
-	}
-}
-
 type SUsers interface {
-	AddUser(user User) (int, error)
+	AddUser(user structions.User) (int, error)
 	Authorization(login string, password string) (string, time.Time, error)
 	Authentication(token string) (int, string, error)
 }
@@ -63,7 +39,7 @@ func NewUserService(db *mongo.Database) *UserService {
 	}
 }
 
-func (u *UserService) AddUser(user User) (int, error) {
+func (u *UserService) AddUser(user structions.User) (int, error) {
 	_, err := u.Us.AddUser(context.TODO(), repository.NewDbUser(&user.Login, &user.Password, int(user.Role), &user.Email, &user.Catalogues))
 	if err != nil {
 		if mongo.IsDuplicateKeyError(err) {

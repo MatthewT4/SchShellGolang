@@ -30,6 +30,7 @@ type SCatalogues interface {
 	SInsertDataInCatalog(Holder string, NameCatalog string, data string) (int, string)
 	SGetCatalogs(holder string) ([]string, error)
 	SGetDataInCatalog(holder string, catalogName string) (int, []byte)
+	SDeleteDataInCatalog(Holder string, NameCatalog string, DataName string) (int, string)
 }
 
 type CataloguesService struct {
@@ -91,3 +92,21 @@ func (cat *CataloguesService) SInsertDataInCatalog(Holder string, NameCatalog st
 	}
 	return 200, "OK"
 }
+
+func (cat *CataloguesService) SDeleteDataInCatalog(Holder string, NameCatalog string, DataName string) (int, string) {
+	_, err := cat.Cat.DelDataInCatalog(context.TODO(), Holder, NameCatalog, DataName)
+	if err != nil {
+		log.Println(err.Error())
+		return 500, "Server Error"
+	}
+	return 200, "OK"
+}
+
+/*
+	+AddCatalog
+	DelCatalog
+	+GetCatalogs
+	+AddDataInCatalog
+	+GetDataInCatalog
+	+DelDataInCatalog
+*/
