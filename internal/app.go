@@ -16,6 +16,7 @@ import (
 type Role int
 
 const (
+	Screen  = -1
 	Default = iota
 	Moderator
 	Administrator
@@ -29,7 +30,7 @@ func Start() {
 	fmt.Println(tok, er)
 	//str,  e := tkm.Parse(tok)
 	fmt.Println(str, e)*/
-	client, err := mongodb.NewClient("mongodb+srv://cluster0.lbets.mongodb.net", "Mathew", "8220")
+	client, err := mongodb.NewClient("mongodb+srv://cluster0.lbets.mongodb.net/myFirstDatabase", "Mathew", "8220")
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/MatthewT4/SchShellGolang/internal/service"
+	"github.com/MatthewT4/SchShellGolang/internal/structions"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -22,7 +23,7 @@ func (rout *Router) AddCatalog(w http.ResponseWriter, r *http.Request) {
 	}
 	log.Println(cat.Name, cat.Type)
 	userGroup := r.Context().Value(GroupKey)
-	if userGroup.(int) < service.Administration || cat.Holder == "" { // you can add catalogues for other users only from the "administrator" level
+	if userGroup.(int) < structions.Administration || cat.Holder == "" { // you can add catalogues for other users only from the "administrator" level
 		userInter := r.Context().Value(UserKey)
 		cat.Holder = userInter.(string)
 	}
@@ -53,7 +54,7 @@ func (rout *Router) GetCatalogs(w http.ResponseWriter, r *http.Request) {
 func (rout *Router) GetDataInCatalog(w http.ResponseWriter, r *http.Request) {
 	holder := r.URL.Query().Get("holder")
 	userGroup := r.Context().Value(GroupKey)
-	if userGroup.(int) < service.Administration || holder == "" { // you can add catalogues for other users only from the "administrator" level
+	if userGroup.(int) < structions.Administration || holder == "" { // you can add catalogues for other users only from the "administrator" level
 		userInter := r.Context().Value(UserKey)
 		holder = userInter.(string)
 	}
@@ -110,7 +111,7 @@ func (rout *Router) DelDataInCatalog(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Parse JSON error", 400)
 		return
 	}
-	if r.Context().Value(GroupKey).(int) < service.Administration || OnlyDelDataVar.Holder == "" {
+	if r.Context().Value(GroupKey).(int) < structions.Administration || OnlyDelDataVar.Holder == "" {
 		OnlyDelDataVar.Holder = r.Context().Value(UserKey).(string)
 	}
 	code, ret := rout.ser.CatalogSer.SDeleteDataInCatalog(OnlyDelDataVar.Holder, OnlyDelDataVar.NameCatalog, OnlyDelDataVar.Data)

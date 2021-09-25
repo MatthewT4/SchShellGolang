@@ -4,12 +4,6 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-const (
-	User = iota
-	Moderation
-	Administration
-)
-
 type Service struct {
 	CatalogSer SCatalogues
 	ScreenSer  SScreens

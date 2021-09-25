@@ -14,6 +14,7 @@ import (
 const SignKey = "djskffdlsvshjsjdcfnv"
 
 const timerJWT = 15 * time.Minute
+const screenJWT = 150 * time.Minute
 
 type SUsers interface {
 	AddUser(user structions.User) (int, error)

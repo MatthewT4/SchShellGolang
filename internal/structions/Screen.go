@@ -1,8 +1,8 @@
 package structions
 
 type Screen struct {
-	Id       string `bson:"id"`
+	ScreenId string `bson:"screen_id"`
 	Name     string `bson:"name"`
-	Image    string `bson:"image"`
-	Position string `bson:"position"`
+	Data     string `bson:"data"`
+	Code     string `bson:"code"`
 }

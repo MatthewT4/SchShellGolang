@@ -47,7 +47,6 @@ func (m *Manager) NewJWT(ID string, group int, ttl time.Duration) (string, error
 			ID:    ID,
 			Group: group,
 		})
-
 	return token.SignedString([]byte(m.signingKey))
 }
 

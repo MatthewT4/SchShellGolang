@@ -3,7 +3,8 @@ package structions
 type RoleType int
 
 const (
-	UserRole = iota
+	ScreenR = -1
+	UserR   = iota
 	Moderation
 	Administration
 )

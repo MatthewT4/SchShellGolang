@@ -22,6 +22,7 @@ func (rout *Router) Start() {
 	r := rou.PathPrefix("/api/").Subrouter()
 	r.HandleFunc("/getdata", rout.GetData)
 	r.HandleFunc("/login", rout.Authorization)
+	r.HandleFunc("/screen_register", rout.NewScreen)
 	rou.Handle("/", r)
 
 	rAdm := rou.PathPrefix("/api/admin").Subrouter()
